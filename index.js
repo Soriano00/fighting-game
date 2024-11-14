@@ -7,7 +7,7 @@ canvas.width = 1800
 canvas.height = 700
 
 c.fillRect(0, 0, canvas.width, canvas.height)
-const gravity = 0.2
+const gravity = 0.7
 
 
 /**********************Create player and enemy**********************/
@@ -17,6 +17,8 @@ class Sprite{
         this.position = position
         this.velocity = velocity
         this.height = 150
+        this.lastKey
+        this.canJump = true
 
     }
 
@@ -31,8 +33,10 @@ class Sprite{
         this.position.x += this.velocity.x
         this.position.y += this.velocity.y
 
-        if(this.position.y + this.height + this.velocity.y >= canvas.height)
+        if(this.position.y + this.height + this.velocity.y >= canvas.height){
             this.velocity.y = 0
+            this.canJump = true
+        }
         else
             this.velocity.y += gravity
     }
@@ -85,8 +89,6 @@ const keys = {
 }
 
 
-let lastKey
-
 function animate(){
 
     window.requestAnimationFrame(animate)
@@ -97,20 +99,23 @@ function animate(){
     player.update()
     enemy.update()
 
+
+    //Player movement
     player.velocity.x = 0
 
-    if(keys.a.pressed && lastKey === 'a'){
-        player.velocity.x = -1
-    }else if (keys.d.pressed && lastKey === 'd'){
-        player.velocity.x = 1
+    if(keys.a.pressed && player.lastKey === 'a'){
+        player.velocity.x = -3
+    }else if (keys.d.pressed && player.lastKey === 'd'){
+        player.velocity.x = 3
     }
 
+    //Enemy movement
     enemy.velocity.x = 0
 
-    if(keys.ArrowRight.pressed && lastKey === 'ArrowRight'){
-        enemy.velocity.x = 1
-    }else if (keys.ArrowLeft.pressed && lastKey === 'ArrowLeft'){
-        enemy.velocity.x = -1
+    if(keys.ArrowRight.pressed && enemy.lastKey === 'ArrowRight'){
+        enemy.velocity.x = 3
+    }else if (keys.ArrowLeft.pressed && enemy.lastKey === 'ArrowLeft'){
+        enemy.velocity.x = -3
     }
 }
 
@@ -118,26 +123,37 @@ animate()
 
 
 window.addEventListener('keydown', (event) => {
-    switch(event.key){   
+    switch(event.key){  
+        //For player 
         case 'a':
             keys.a.pressed = true 
-            lastKey = 'a'    
+            player.lastKey = 'a'    
         break
         case 'd':
             keys.d.pressed = true 
-            lastKey = 'd'     
+            player.lastKey = 'd'     
         break
         case 'w':
-            keys.w.pressed = true 
-            lastKey = 'w'    
+            if(player.canJump){
+                player.velocity.y = -20
+                player.canJump = false
+            }  
         break
+
+         //For enemy
         case 'ArrowRight':
             keys.ArrowRight.pressed = true 
-            lastKey = 'ArrowRight'      
+            enemy.lastKey = 'ArrowRight'      
         break
         case 'ArrowLeft':
             keys.ArrowLeft.pressed = true
-            lastKey = 'ArrowLeft'       
+            enemy.lastKey = 'ArrowLeft'       
+        break
+        case 'ArrowUp':
+            if(enemy.canJump){
+                enemy.velocity.y = -20
+                enemy.canJump = false
+            }  
         break
     }
     console.log(event.key)
@@ -145,15 +161,15 @@ window.addEventListener('keydown', (event) => {
 
 window.addEventListener('keyup', (event) => {
     switch(event.key){
+         //For player 
         case 'a':
             keys.a.pressed = false  
         break
         case 'd':
             keys.d.pressed = false    
         break
-        case 'w':
-            keys.w.pressed = false  
-        break
+
+         //For enemy
         case 'ArrowRight':
             keys.ArrowRight.pressed = false   
         break
