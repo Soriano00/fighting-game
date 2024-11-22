@@ -33,7 +33,7 @@ const shop = new Sprite({
 
 const player = new Fighter({
     position: {
-        x: 124,
+        x: 0,
         y: 0
     },
     velocity: {
@@ -43,6 +43,23 @@ const player = new Fighter({
     offset: {
         x: 0,
         y: 0
+    }, 
+    imageSrc: '../assets/samuraiMack/Idle.png',
+    framesMax: 8,
+    scale: 2.5,
+    offset: {
+        x: 215,
+        y: 157
+    },
+    sprites: {
+        idle: {
+            imageSrc: '../assets/samuraiMack/Idle.png',
+            framesMax: 8
+        },
+        run: {
+            imageSrc: '../assets/samuraiMack/Run.png',
+            framesMax: 8
+        }
     }
 })
 
@@ -92,7 +109,7 @@ function animate() {
     shop.update()
 
     player.update()
-    enemy.update()
+    //enemy.update()
 
     // Update attackBox direction
     updateAttackBoxDirection()
@@ -100,10 +117,14 @@ function animate() {
     // Player movement
     player.velocity.x = 0
 
+    player.image = player.sprites.idle.image
+
     if (keys.a.pressed && player.lastKey === 'a') {
         player.velocity.x = -3
+        player.image = player.sprites.run.image
     } else if (keys.d.pressed && player.lastKey === 'd') {
         player.velocity.x = 3
+        player.image = player.sprites.run.image
     }
 
     // Enemy movement
