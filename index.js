@@ -6,7 +6,7 @@ canvas.width = 1024
 canvas.height = 576
 
 c.fillRect(0, 0, canvas.width, canvas.height)
-const gravity = 0.7
+const gravity = 0.4
 
 /**********************Create player and enemy**********************/
 
@@ -59,24 +59,65 @@ const player = new Fighter({
         run: {
             imageSrc: '../assets/samuraiMack/Run.png',
             framesMax: 8
+        },
+        jump: {
+            imageSrc: '../assets/samuraiMack/Jump.png',
+            framesMax: 2
+        },       
+        fall: {
+            imageSrc: '../assets/samuraiMack/Fall.png',
+            framesMax: 2
+        },        
+        attack1: {
+            imageSrc: '../assets/samuraiMack/Attack1.png',
+            framesMax: 6
         }
     }
 })
 
 const enemy = new Fighter({
     position: {
-        x: 900,
-        y: 0
+        x: 400,
+        y: 100
     },
     velocity: {
         x: 0,
         y: 0
     },
+   
     offset: {
         x: -50,
         y: 0
     },
-    color: 'green'
+    imageSrc: '../assets/kenji/Idle.png',
+    framesMax: 4,
+    scale: 2.5,
+    offset: {
+        x: 215,
+        y: 157
+    },
+    sprites: {
+        idle: {
+            imageSrc: '../assets/kenji/Idle.png',
+            framesMax: 4
+        },
+        run: {
+            imageSrc: '../assets/kenji/Run.png',
+            framesMax: 8
+        },
+        jump: {
+            imageSrc: '../assets/kenji/Jump.png',
+            framesMax: 2
+        },       
+        fall: {
+            imageSrc: '../assets/kenji/Fall.png',
+            framesMax: 2
+        },        
+        attack1: {
+            imageSrc: '../assets/kenji/Attack1.png',
+            framesMax: 4
+        }
+    }
 })
 
 console.log(player)
@@ -109,7 +150,7 @@ function animate() {
     shop.update()
 
     player.update()
-    //enemy.update()
+    enemy.update()
 
     // Update attackBox direction
     updateAttackBoxDirection()
@@ -117,14 +158,22 @@ function animate() {
     // Player movement
     player.velocity.x = 0
 
-    player.image = player.sprites.idle.image
+   
 
     if (keys.a.pressed && player.lastKey === 'a') {
         player.velocity.x = -3
-        player.image = player.sprites.run.image
+        player.switchSprite('run')
     } else if (keys.d.pressed && player.lastKey === 'd') {
         player.velocity.x = 3
-        player.image = player.sprites.run.image
+        player.switchSprite('run')
+    }else{
+        player.switchSprite('idle')
+    }
+
+    if(player.velocity.y < 0){
+        player.switchSprite('jump')
+    }else if (player.velocity.y > 0){ 
+        player.switchSprite('fall')
     }
 
     // Enemy movement
@@ -132,8 +181,18 @@ function animate() {
 
     if (keys.ArrowRight.pressed && enemy.lastKey === 'ArrowRight') {
         enemy.velocity.x = 3
+        enemy.switchSprite('run')
     } else if (keys.ArrowLeft.pressed && enemy.lastKey === 'ArrowLeft') {
         enemy.velocity.x = -3
+        enemy.switchSprite('run')
+    }else{
+        enemy.switchSprite('idle')
+    }
+
+    if(enemy.velocity.y < 0){
+        enemy.switchSprite('jump')
+    }else if (enemy.velocity.y > 0){ 
+        enemy.switchSprite('fall')
     }
 
     // Detect collision
@@ -182,7 +241,7 @@ window.addEventListener('keydown', (event) => {
             break
         case 'w':
             if (player.canJump) {
-                player.velocity.y = -20
+                player.velocity.y = -14
                 player.canJump = false
             }
             break
@@ -201,7 +260,7 @@ window.addEventListener('keydown', (event) => {
             break
         case 'ArrowUp':
             if (enemy.canJump) {
-                enemy.velocity.y = -20
+                enemy.velocity.y = -14
                 enemy.canJump = false
             }
             break
